@@ -75,7 +75,7 @@ export default function LandingPage() {
               Start Building →
             </Link>
             <a
-              href="https://github.com"
+              href="https://github.com/malakhov-dmitrii/nextjs-supabase-creem-boilerplate"
               target="_blank"
               rel="noopener noreferrer"
               className="px-8 py-3 text-base btn-secondary"

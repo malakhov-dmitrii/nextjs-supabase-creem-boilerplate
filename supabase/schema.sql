@@ -50,3 +50,22 @@ create table if not exists public.webhook_events (
 create index if not exists idx_webhook_events_processed_at on public.webhook_events(processed_at);
 
 alter table public.webhook_events enable row level security;
+
+-- Purchases table: one-time purchases synced via Creem webhooks
+create table if not exists public.purchases (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  creem_customer_id text,
+  creem_product_id text not null,
+  product_name text,
+  purchased_at timestamptz default now()
+);
+
+create index if not exists idx_purchases_user_id on public.purchases(user_id);
+
+-- RLS
+alter table public.purchases enable row level security;
+
+create policy "Users can view own purchases"
+  on public.purchases for select
+  using (auth.uid() = user_id);

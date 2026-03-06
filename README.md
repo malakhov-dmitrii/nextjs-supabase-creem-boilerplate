@@ -31,7 +31,7 @@ A production-ready SaaS boilerplate that lets you launch your paid SaaS in hours
 ### 1. Clone and Install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/saaskit-creem.git
+git clone https://github.com/malakhov-dmitrii/nextjs-supabase-creem-boilerplate.git
 cd saaskit-creem
 npm install
 ```
@@ -166,7 +166,7 @@ Users manage their subscription (upgrade, cancel, update payment method) via Cre
 
 ## Deploy to Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/YOUR_USERNAME/saaskit-creem)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/malakhov-dmitrii/nextjs-supabase-creem-boilerplate)
 
 1. Click the button above
 2. Add environment variables in Vercel dashboard

@@ -4,7 +4,7 @@ test.describe("Pricing Page", () => {
   test("renders all three pricing plans", async ({ page }) => {
     await page.goto("/pricing");
 
-    await expect(page.getByText("Simple, transparent pricing")).toBeVisible();
+    await expect(page.getByRole("heading", { name: /simple.*transparent.*pricing/i })).toBeVisible();
 
     // Plan names
     await expect(page.getByRole("heading", { name: "Starter" })).toBeVisible();

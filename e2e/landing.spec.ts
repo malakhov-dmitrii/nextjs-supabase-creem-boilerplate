@@ -5,7 +5,7 @@ test.describe("Landing Page", () => {
     await page.goto("/");
 
     await expect(page.getByText("SaaSKit")).toBeVisible();
-    await expect(page.getByRole("heading", { name: /Launch your SaaS.*in hours/i })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /launch your.*saas/i })).toBeVisible();
     await expect(page.getByText("in hours, not weeks")).toBeVisible();
     await expect(page.getByRole("link", { name: "Pricing" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Sign In" })).toBeVisible();
@@ -42,7 +42,7 @@ test.describe("Landing Page", () => {
     await page.goto("/");
     await page.getByRole("link", { name: "Get Started" }).first().click();
     await expect(page).toHaveURL("/signup");
-    await expect(page.getByText("Create Account")).toBeVisible();
+    await expect(page.getByText("Create your account")).toBeVisible();
   });
 
   test("navigates to login page", async ({ page }) => {

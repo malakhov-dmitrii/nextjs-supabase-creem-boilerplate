@@ -39,3 +39,14 @@ $$ language plpgsql;
 create trigger subscriptions_updated_at
   before update on public.subscriptions
   for each row execute function public.handle_updated_at();
+
+-- Webhook events: idempotency tracking
+create table if not exists public.webhook_events (
+  id text primary key,
+  event_type text not null,
+  processed_at timestamptz default now()
+);
+
+create index if not exists idx_webhook_events_processed_at on public.webhook_events(processed_at);
+
+alter table public.webhook_events enable row level security;

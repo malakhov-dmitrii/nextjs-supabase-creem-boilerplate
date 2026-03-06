@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+:root {
+  --bg-primary: #0A0A0A;
+  --bg-secondary: #1E1E1E;
+  --bg-cream: #F5F0EB;
+  --bg-violet: #C4B5FD;
+  --text-primary: #FFFFFF;
+  --text-secondary: #A1A1A1;
+  --text-muted: #666666;
+  --text-dark: #0A0A0A;
+  --accent-orange: #FF6B2C;
+  --accent-violet: #8B5CF6;
+  --border: #2A2A2A;
+  --border-bold: #FFFFFF;
+  --success: #22C55E;
+  --error: #EF4444;
+  --warning: #EAB308;
+}
+
+@theme inline {
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-cream: var(--bg-cream);
+  --color-bg-violet: var(--bg-violet);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-dark: var(--text-dark);
+  --color-accent-orange: var(--accent-orange);
+  --color-accent-violet: var(--accent-violet);
+  --color-border: var(--border);
+  --color-border-bold: var(--border-bold);
+  --color-success: var(--success);
+  --color-error: var(--error);
+  --color-warning: var(--warning);
+  --font-sans: var(--font-bricolage-grotesque);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Neo-brut button utilities */
+@utility btn-primary {
+  @apply bg-accent-orange text-black font-bold border-2 border-black rounded-full;
+  box-shadow: 4px 4px 0px #000;
+  &:hover {
+    translate: 2px 2px;
+    box-shadow: 2px 2px 0px #000;
+  }
+  &:active {
+    translate: 4px 4px;
+    box-shadow: none;
+  }
+  transition: all 150ms;
+}
+
+@utility btn-secondary {
+  @apply bg-white text-black font-bold border-2 border-black rounded-full;
+  box-shadow: 4px 4px 0px #000;
+  &:hover {
+    translate: 2px 2px;
+    box-shadow: 2px 2px 0px #000;
+  }
+  &:active {
+    translate: 4px 4px;
+    box-shadow: none;
+  }
+  transition: all 150ms;
+}
+
+@utility btn-dark {
+  @apply bg-black text-white font-bold border-2 border-black rounded-full;
+  box-shadow: 4px 4px 0px rgba(255, 255, 255, 0.2);
+  &:hover {
+    translate: 2px 2px;
+    box-shadow: 2px 2px 0px rgba(255, 255, 255, 0.2);
+  }
+  &:active {
+    translate: 4px 4px;
+    box-shadow: none;
+  }
+  transition: all 150ms;
+}
+
+@utility btn-disabled {
+  @apply opacity-50;
+  translate: 0 0 !important;
+  box-shadow: none !important;
+}

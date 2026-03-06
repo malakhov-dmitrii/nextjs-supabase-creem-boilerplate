@@ -1,6 +1,8 @@
 import { Creem } from "creem";
 
+const apiKey = process.env.CREEM_API_KEY!;
+
 export const creem = new Creem({
-  apiKey: process.env.CREEM_API_KEY!,
-  serverIdx: 1, // test environment
+  apiKey,
+  serverIdx: apiKey.startsWith("creem_test_") ? 1 : 0,
 });

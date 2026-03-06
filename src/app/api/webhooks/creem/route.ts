@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
-  let event: { event_type: string; object: Record<string, unknown> };
+  let event: { id?: string; event_type: string; object: Record<string, unknown> };
   try {
     event = JSON.parse(body);
   } catch {
@@ -41,6 +41,21 @@ export async function POST(request: NextRequest) {
 
   const eventType = event.event_type;
   const db = getSupabaseAdmin();
+
+  // Idempotency check
+  if (event.id) {
+    const { data: existing } = await db
+      .from("webhook_events")
+      .select("id")
+      .eq("id", event.id)
+      .maybeSingle();
+
+    if (existing) {
+      return NextResponse.json({ received: true, duplicate: true });
+    }
+
+    await db.from("webhook_events").insert({ id: event.id, event_type: eventType });
+  }
 
   if (eventType === "checkout.completed") {
     const { customer, product, subscription } = event.object as {
@@ -53,23 +68,39 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing user_id in metadata" }, { status: 400 });
     }
 
-    const { error } = await db.from("subscriptions").upsert(
-      {
+    if (subscription) {
+      // Subscription purchase — upsert into subscriptions
+      const { error } = await db.from("subscriptions").upsert(
+        {
+          user_id: customer.metadata.user_id,
+          creem_customer_id: customer.id,
+          creem_subscription_id: subscription.id,
+          creem_product_id: product.id,
+          product_name: product.name,
+          status: "active",
+          current_period_end:
+            subscription.current_period_end_date || subscription.current_period_end,
+        },
+        { onConflict: "user_id" },
+      );
+
+      if (error) {
+        console.error("Webhook DB error (checkout.completed subscription):", error);
+        return NextResponse.json({ error: "Database error" }, { status: 500 });
+      }
+    } else {
+      // One-time purchase — insert into purchases
+      const { error } = await db.from("purchases").insert({
         user_id: customer.metadata.user_id,
         creem_customer_id: customer.id,
-        creem_subscription_id: subscription?.id,
         creem_product_id: product.id,
         product_name: product.name,
-        status: "active",
-        current_period_end:
-          subscription?.current_period_end_date || subscription?.current_period_end,
-      },
-      { onConflict: "user_id" },
-    );
+      });
 
-    if (error) {
-      console.error("Webhook DB error (checkout.completed):", error);
-      return NextResponse.json({ error: "Database error" }, { status: 500 });
+      if (error) {
+        console.error("Webhook DB error (checkout.completed one-time):", error);
+        return NextResponse.json({ error: "Database error" }, { status: 500 });
+      }
     }
   } else if (SUBSCRIPTION_STATUS_MAP[eventType]) {
     const sub = event.object as {

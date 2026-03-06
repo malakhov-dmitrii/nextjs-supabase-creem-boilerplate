@@ -24,7 +24,7 @@ A production-ready SaaS boilerplate that lets you launch your paid SaaS in hours
 - Landing page, pricing page, dashboard
 - Responsive design
 - TypeScript strict mode throughout
-- 13+ unit tests covering webhook verification and event handling
+- 90+ unit tests covering webhooks, entitlements, components, and routing
 
 ## Quick Start
 
@@ -104,7 +104,8 @@ src/
 │   ├── subscription-card.tsx       # Subscription status and billing
 │   └── sign-out-button.tsx         # Sign out button
 ├── lib/
-│   ├── creem.ts                    # Creem SDK client
+│   ├── creem.ts                    # Creem SDK client (auto-detects test/prod)
+│   ├── entitlements.ts             # Plan-based feature gating
 │   └── supabase/
 │       ├── client.ts               # Browser Supabase client
 │       ├── server.ts               # Server Supabase client
@@ -150,6 +151,44 @@ All Creem webhook events are handled:
 ### Billing Portal
 
 Users manage their subscription (upgrade, cancel, update payment method) via Creem's hosted billing portal, accessible from the dashboard.
+
+## Entitlements
+
+The boilerplate includes a plan-based feature gating system. See `src/lib/entitlements.ts`.
+
+| Feature | Starter | Pro | Enterprise |
+|---------|---------|-----|------------|
+| Analytics | x | x | x |
+| Email support | x | x | x |
+| API access | | x | x |
+| Priority support | | x | x |
+| Custom integrations | | x | x |
+| Unlimited projects | | x | x |
+| SSO / SAML | | | x |
+| Unlimited team | | | x |
+
+```typescript
+import { hasAccess } from "@/lib/entitlements";
+
+if (await hasAccess(userId, "api")) {
+  // user has API access
+}
+```
+
+## Migrating from Stripe?
+
+See the full migration guide: [docs/stripe-migration.md](docs/stripe-migration.md)
+
+## Troubleshooting
+
+**Subscription not showing after checkout?**
+The webhook may take a few seconds to arrive. Check that your webhook URL is configured in Creem dashboard and that `CREEM_WEBHOOK_SECRET` matches.
+
+**RLS errors when querying subscriptions?**
+Make sure you're using the server Supabase client (with cookies) for user queries and the admin client (with service role key) for webhook handlers.
+
+**Test mode vs production?**
+The SDK auto-detects based on your API key prefix. Keys starting with `creem_test_` use the test API.
 
 ## Scripts
 

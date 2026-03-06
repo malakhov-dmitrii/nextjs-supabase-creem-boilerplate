@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createSupabaseBrowser } from "@/lib/supabase/client";
 
@@ -9,7 +10,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const router = useRouter();
   const supabase = createSupabaseBrowser();
 
   async function handleSignup(e: React.FormEvent) {
@@ -20,37 +21,15 @@ export default function SignupPage() {
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
-      },
     });
 
     if (error) {
       setError(error.message);
       setLoading(false);
     } else {
-      setSuccess(true);
-      setLoading(false);
+      router.push("/dashboard");
+      router.refresh();
     }
-  }
-
-  if (success) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-bg-primary">
-        <div
-          className="w-full max-w-md p-8 bg-bg-secondary rounded-2xl border-2 border-border text-center"
-          style={{ boxShadow: "6px 6px 0px rgba(255, 255, 255, 0.06)" }}
-        >
-          <h1 className="text-2xl font-extrabold text-text-primary mb-4">
-            Check your email
-          </h1>
-          <p className="text-text-secondary">
-            We sent a confirmation link to{" "}
-            <strong className="text-text-primary">{email}</strong>.
-          </p>
-        </div>
-      </div>
-    );
   }
 
   return (

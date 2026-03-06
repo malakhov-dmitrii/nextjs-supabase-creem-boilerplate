@@ -64,10 +64,13 @@ test.describe("Authentication Pages", () => {
       await page.getByLabel("Password").fill("testpassword123");
       await page.getByRole("button", { name: "Sign Up" }).click();
 
-      // Should show loading or success state
+      // Should show loading state or redirect to dashboard
       await expect(
-        page.getByText("Creating account...").or(page.getByText("Check your email")),
-      ).toBeVisible({ timeout: 10000 });
+        page.getByText("Creating account..."),
+      ).toBeVisible({ timeout: 5000 }).catch(() => {
+        // Already redirected to dashboard
+        return expect(page).toHaveURL(/\/dashboard/);
+      });
     });
   });
 });

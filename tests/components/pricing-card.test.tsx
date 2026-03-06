@@ -84,12 +84,11 @@ describe("PricingCard", () => {
     });
     vi.stubGlobal("fetch", mockFetch);
 
-    // jsdom doesn't navigate; spy on the setter instead
+    // jsdom doesn't navigate; intercept href assignment
     const hrefSetter = vi.fn();
-    vi.spyOn(window, "location", "get").mockReturnValue({
-      ...window.location,
-      set href(val: string) { hrefSetter(val); },
-    } as Location);
+    const locationMock = { ...window.location } as Location;
+    Object.defineProperty(locationMock, "href", { set: hrefSetter, get: () => "" });
+    vi.spyOn(window, "location", "get").mockReturnValue(locationMock);
 
     render(<PricingCard plan={mockPlan} />);
     await act(async () => {

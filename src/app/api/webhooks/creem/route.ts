@@ -32,14 +32,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
-  let event: { id?: string; event_type: string; object: Record<string, unknown> };
+  let event: { id?: string; eventType: string; object: Record<string, unknown> };
   try {
     event = JSON.parse(body);
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const eventType = event.event_type;
+  const eventType = event.eventType;
   const db = getSupabaseAdmin();
 
   // Idempotency check
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ received: true, duplicate: true });
     }
 
-    await db.from("webhook_events").insert({ id: event.id, event_type: eventType });
+    await db.from("webhook_events").insert({ id: event.id, event_type: eventType as string });
   }
 
   if (eventType === "checkout.completed") {

@@ -37,10 +37,10 @@ type WebhookResult =
   | { error: string; status: number };
 
 function processWebhookEvent(event: {
-  event_type: string;
+  eventType: string;
   object: Record<string, unknown>;
 }): WebhookResult {
-  const { event_type, object } = event;
+  const { eventType: event_type, object } = event;
 
   if (event_type === "checkout.completed") {
     const checkout = object as {
@@ -117,25 +117,25 @@ describe("Webhook Route", () => {
 
   describe("Signature Verification", () => {
     it("valid signature accepted", () => {
-      const payload = JSON.stringify({ event_type: "checkout.completed", object: {} });
+      const payload = JSON.stringify({ eventType: "checkout.completed", object: {} });
       const sig = signPayload(payload, secret);
       expect(verifyWebhookSignature(payload, sig, secret)).toBe(true);
     });
 
     it("invalid signature rejected", () => {
-      const payload = JSON.stringify({ event_type: "checkout.completed" });
+      const payload = JSON.stringify({ eventType: "checkout.completed" });
       expect(verifyWebhookSignature(payload, "deadbeef00000000", secret)).toBe(false);
     });
 
     it("tampered payload rejected", () => {
-      const payload = JSON.stringify({ event_type: "checkout.completed" });
+      const payload = JSON.stringify({ eventType: "checkout.completed" });
       const sig = signPayload(payload, secret);
-      const tampered = JSON.stringify({ event_type: "checkout.completed", hacked: true });
+      const tampered = JSON.stringify({ eventType: "checkout.completed", hacked: true });
       expect(verifyWebhookSignature(tampered, sig, secret)).toBe(false);
     });
 
     it("wrong secret rejected", () => {
-      const payload = JSON.stringify({ event_type: "checkout.completed" });
+      const payload = JSON.stringify({ eventType: "checkout.completed" });
       const sig = signPayload(payload, "wrong_secret");
       expect(verifyWebhookSignature(payload, sig, secret)).toBe(false);
     });
@@ -150,14 +150,14 @@ describe("Webhook Route", () => {
     });
 
     it("empty signature string rejected", () => {
-      const payload = JSON.stringify({ event_type: "checkout.completed" });
+      const payload = JSON.stringify({ eventType: "checkout.completed" });
       expect(verifyWebhookSignature(payload, "", secret)).toBe(false);
     });
   });
 
   describe("Event Processing — checkout.completed subscription", () => {
     const baseCheckout = {
-      event_type: "checkout.completed",
+      eventType: "checkout.completed",
       object: {
         customer: { id: "cust_123", metadata: { user_id: "uuid-456" } },
         product: { id: "prod_789", name: "Pro Plan" },
@@ -183,7 +183,7 @@ describe("Webhook Route", () => {
 
     it("fallback to current_period_end when current_period_end_date missing", () => {
       const event = {
-        event_type: "checkout.completed",
+        eventType: "checkout.completed",
         object: {
           customer: { id: "cust_1", metadata: { user_id: "uuid-1" } },
           product: { id: "prod_1", name: "Starter" },
@@ -202,7 +202,7 @@ describe("Webhook Route", () => {
 
     it("reject checkout without user_id in metadata", () => {
       const event = {
-        event_type: "checkout.completed",
+        eventType: "checkout.completed",
         object: {
           customer: { id: "cust_1", metadata: {} },
           product: { id: "prod_1", name: "Pro" },
@@ -215,7 +215,7 @@ describe("Webhook Route", () => {
 
     it("reject checkout with no metadata", () => {
       const event = {
-        event_type: "checkout.completed",
+        eventType: "checkout.completed",
         object: {
           customer: { id: "cust_1" },
           product: { id: "prod_1", name: "Pro" },
@@ -230,7 +230,7 @@ describe("Webhook Route", () => {
   describe("Event Processing — checkout.completed one-time purchase", () => {
     it("insert purchase when no subscription object in event", () => {
       const event = {
-        event_type: "checkout.completed",
+        eventType: "checkout.completed",
         object: {
           customer: { id: "cust_2", metadata: { user_id: "uuid-789" } },
           product: { id: "prod_lt", name: "Lifetime Deal" },
@@ -253,7 +253,7 @@ describe("Webhook Route", () => {
   describe("Subscription status changes", () => {
     it("subscription.active -> status active with period_end", () => {
       const result = processWebhookEvent({
-        event_type: "subscription.active",
+        eventType: "subscription.active",
         object: { id: "sub_1", current_period_end: "2026-04-06T00:00:00Z" },
       });
       expect(result).toEqual({
@@ -265,7 +265,7 @@ describe("Webhook Route", () => {
 
     it("subscription.renewed -> status active with period_end", () => {
       const result = processWebhookEvent({
-        event_type: "subscription.renewed",
+        eventType: "subscription.renewed",
         object: { id: "sub_2", current_period_end: "2026-05-06T00:00:00Z" },
       });
       expect(result).toEqual({
@@ -277,7 +277,7 @@ describe("Webhook Route", () => {
 
     it("subscription.cancelled -> status cancelled", () => {
       const result = processWebhookEvent({
-        event_type: "subscription.cancelled",
+        eventType: "subscription.cancelled",
         object: { id: "sub_3" },
       });
       expect(result).toEqual({
@@ -289,7 +289,7 @@ describe("Webhook Route", () => {
 
     it("subscription.paused -> status paused", () => {
       const result = processWebhookEvent({
-        event_type: "subscription.paused",
+        eventType: "subscription.paused",
         object: { id: "sub_4" },
       });
       expect(result).toEqual({
@@ -301,7 +301,7 @@ describe("Webhook Route", () => {
 
     it("subscription.expired -> status expired", () => {
       const result = processWebhookEvent({
-        event_type: "subscription.expired",
+        eventType: "subscription.expired",
         object: { id: "sub_5" },
       });
       expect(result).toEqual({
@@ -313,7 +313,7 @@ describe("Webhook Route", () => {
 
     it("no period_end included for non-active statuses", () => {
       const cancelled = processWebhookEvent({
-        event_type: "subscription.cancelled",
+        eventType: "subscription.cancelled",
         object: { id: "sub_6", current_period_end: "2026-04-06T00:00:00Z" },
       });
       expect(cancelled).toMatchObject({ action: "update_subscription" });
@@ -322,7 +322,7 @@ describe("Webhook Route", () => {
 
     it("active status without period_end omits current_period_end", () => {
       const result = processWebhookEvent({
-        event_type: "subscription.active",
+        eventType: "subscription.active",
         object: { id: "sub_7" },
       });
       expect(result).toMatchObject({ action: "update_subscription" });
@@ -333,7 +333,7 @@ describe("Webhook Route", () => {
   describe("Unhandled events", () => {
     it("unknown event type returns unhandled", () => {
       const result = processWebhookEvent({
-        event_type: "payment.mystery",
+        eventType: "payment.mystery",
         object: {},
       });
       expect(result).toEqual({ action: "unhandled", eventType: "payment.mystery" });
@@ -341,7 +341,7 @@ describe("Webhook Route", () => {
 
     it("invoice.paid returns unhandled", () => {
       const result = processWebhookEvent({
-        event_type: "invoice.paid",
+        eventType: "invoice.paid",
         object: {},
       });
       expect(result).toEqual({ action: "unhandled", eventType: "invoice.paid" });

@@ -51,7 +51,5 @@ next-env.d.ts
 # omc state
 .omc/
 
-# Video proofs (too large for git, available on request)
-video-proofs/*.webm
-video-proofs/*.png
+# Video proof scripts
 video-proofs/*.mjs

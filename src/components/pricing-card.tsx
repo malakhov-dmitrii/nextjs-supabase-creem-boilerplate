@@ -11,7 +11,7 @@ interface PricingPlan {
   popular?: boolean;
 }
 
-export function PricingCard({ plan }: { plan: PricingPlan }) {
+export function PricingCard({ plan, discountCode }: { plan: PricingPlan; discountCode?: string }) {
   const [loading, setLoading] = useState(false);
 
   async function handleCheckout() {
@@ -19,7 +19,7 @@ export function PricingCard({ plan }: { plan: PricingPlan }) {
     const res = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ productId: plan.productId }),
+      body: JSON.stringify({ productId: plan.productId, discountCode }),
     });
 
     const data = await res.json();
@@ -56,10 +56,7 @@ export function PricingCard({ plan }: { plan: PricingPlan }) {
       </div>
       <ul className="space-y-3 mb-8 flex-1">
         {plan.features.map((feature) => (
-          <li
-            key={feature}
-            className="flex items-center gap-2.5 text-sm text-text-secondary"
-          >
+          <li key={feature} className="flex items-center gap-2.5 text-sm text-text-secondary">
             <svg
               className="w-5 h-5 text-success flex-shrink-0"
               fill="none"
@@ -84,9 +81,7 @@ export function PricingCard({ plan }: { plan: PricingPlan }) {
         onClick={handleCheckout}
         disabled={loading}
         className={`w-full py-3 text-base ${
-          plan.popular
-            ? "btn-primary"
-            : "btn-dark"
+          plan.popular ? "btn-primary" : "btn-dark"
         } disabled:btn-disabled`}
       >
         {loading ? "Redirecting..." : "Get Started →"}

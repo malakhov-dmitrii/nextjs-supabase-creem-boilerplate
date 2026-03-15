@@ -18,8 +18,8 @@ test.describe("Dashboard (authenticated)", () => {
   test.beforeEach(async ({ page }) => {
     // Login first
     await page.goto("/login");
-    await page.getByLabel("Email").fill(testEmail);
-    await page.getByLabel("Password").fill(testPassword);
+    await page.getByLabel("Email").fill(testEmail!);
+    await page.getByLabel("Password").fill(testPassword!);
     await page.getByRole("button", { name: "Sign In" }).click();
 
     // Wait for dashboard redirect
@@ -28,7 +28,7 @@ test.describe("Dashboard (authenticated)", () => {
 
   test("shows dashboard with user email", async ({ page }) => {
     await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
-    await expect(page.getByText(testEmail)).toBeVisible();
+    await expect(page.getByText(testEmail!)).toBeVisible();
   });
 
   test("shows subscription card", async ({ page }) => {

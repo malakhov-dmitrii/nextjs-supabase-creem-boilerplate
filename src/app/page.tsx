@@ -5,7 +5,6 @@ function WaveDivider({ flip, fill = "var(--bg-primary)" }: { flip?: boolean; fil
   return (
     <div className={`w-full overflow-hidden leading-[0] ${flip ? "rotate-180" : ""}`}>
       <svg
-        aria-hidden="true"
         viewBox="0 0 1440 120"
         preserveAspectRatio="none"
         className="w-full h-[60px] md:h-[80px]"
@@ -22,12 +21,7 @@ function WaveDivider({ flip, fill = "var(--bg-primary)" }: { flip?: boolean; fil
 function ZigzagDivider({ fill = "var(--bg-cream)" }: { fill?: string }) {
   return (
     <div className="w-full overflow-hidden leading-[0]">
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 1440 60"
-        preserveAspectRatio="none"
-        className="w-full h-[30px] md:h-[40px]"
-      >
+      <svg viewBox="0 0 1440 60" preserveAspectRatio="none" className="w-full h-[30px] md:h-[40px]">
         <polygon
           points="0,60 20,0 40,60 60,0 80,60 100,0 120,60 140,0 160,60 180,0 200,60 220,0 240,60 260,0 280,60 300,0 320,60 340,0 360,60 380,0 400,60 420,0 440,60 460,0 480,60 500,0 520,60 540,0 560,60 580,0 600,60 620,0 640,60 660,0 680,60 700,0 720,60 740,0 760,60 780,0 800,60 820,0 840,60 860,0 880,60 900,0 920,60 940,0 960,60 980,0 1000,60 1020,0 1040,60 1060,0 1080,60 1100,0 1120,60 1140,0 1160,60 1180,0 1200,60 1220,0 1240,60 1260,0 1280,60 1300,0 1320,60 1340,0 1360,60 1380,0 1400,60 1420,0 1440,60"
           fill={fill}

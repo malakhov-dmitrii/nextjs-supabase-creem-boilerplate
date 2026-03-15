@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { OAuthButtons } from "@/components/oauth-buttons";
 import { createSupabaseBrowser } from "@/lib/supabase/client";
 
 export default function LoginPage() {
@@ -48,12 +49,8 @@ export default function LoginPage() {
             className="p-8 bg-bg-secondary rounded-2xl border-2 border-border"
             style={{ boxShadow: "6px 6px 0px rgba(255, 255, 255, 0.06)" }}
           >
-            <h1 className="text-2xl font-extrabold text-text-primary mb-1">
-              Sign in to SaaSKit
-            </h1>
-            <p className="text-text-muted text-sm mb-6">
-              Enter your credentials to continue
-            </p>
+            <h1 className="text-2xl font-extrabold text-text-primary mb-1">Sign in to SaaSKit</h1>
+            <p className="text-text-muted text-sm mb-6">Enter your credentials to continue</p>
 
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
@@ -100,6 +97,17 @@ export default function LoginPage() {
                 {loading ? "Signing in..." : "Sign In →"}
               </button>
             </form>
+
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="bg-bg-secondary px-3 text-text-muted font-medium">or</span>
+              </div>
+            </div>
+
+            <OAuthButtons />
 
             <p className="text-center mt-5 text-sm text-text-muted">
               Don&apos;t have an account?{" "}

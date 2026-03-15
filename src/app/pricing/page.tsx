@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PricingCard } from "@/components/pricing-card";
+import { PricingSection } from "@/components/pricing-section";
 
 // Creem test product IDs — replace with production IDs before going live
 const plans = [
@@ -44,7 +44,11 @@ const plans = [
 function WaveDivider({ fill = "var(--bg-primary)" }: { fill?: string }) {
   return (
     <div className="w-full overflow-hidden leading-[0]">
-      <svg viewBox="0 0 1440 120" preserveAspectRatio="none" className="w-full h-[60px] md:h-[80px]">
+      <svg
+        viewBox="0 0 1440 120"
+        preserveAspectRatio="none"
+        className="w-full h-[60px] md:h-[80px]"
+      >
         <path
           d="M0,40 C360,120 720,0 1080,80 C1260,120 1380,40 1440,60 L1440,120 L0,120 Z"
           fill={fill}
@@ -71,10 +75,7 @@ export default function PricingPage() {
               >
                 Sign In
               </Link>
-              <Link
-                href="/signup"
-                className="text-sm px-5 py-2 btn-primary"
-              >
+              <Link href="/signup" className="text-sm px-5 py-2 btn-primary">
                 Get Started
               </Link>
             </nav>
@@ -103,11 +104,7 @@ export default function PricingPage() {
       {/* ═══ Pricing Cards — Dark section ═══ */}
       <section className="bg-bg-primary py-16">
         <div className="max-w-5xl mx-auto px-4 md:px-6">
-          <div className="grid gap-6 md:grid-cols-3">
-            {plans.map((plan) => (
-              <PricingCard key={plan.name} plan={plan} />
-            ))}
-          </div>
+          <PricingSection plans={plans} />
         </div>
       </section>
 

@@ -1,133 +1,182 @@
-import crypto from "node:crypto";
-import { type NextRequest, NextResponse } from "next/server";
+import { Webhook } from "@creem_io/nextjs";
+import { isDemoMode } from "@/lib/demo/mode";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { buildSubscriptionUpdate, buildSubscriptionUpsert } from "./handlers";
 
-const SUBSCRIPTION_STATUS_MAP: Record<string, string> = {
-  "subscription.active": "active",
-  "subscription.renewed": "active",
-  "subscription.cancelled": "cancelled",
-  "subscription.expired": "expired",
-  "subscription.paused": "paused",
-};
-
-function verifyWebhookSignature(payload: string, signature: string, secret: string): boolean {
-  const hmac = crypto.createHmac("sha256", secret);
-  const digest = hmac.update(payload).digest("hex");
-  try {
-    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(digest));
-  } catch {
-    return false;
-  }
-}
-
-export async function POST(request: NextRequest) {
-  const body = await request.text();
-  const signature = request.headers.get("creem-signature");
-
-  if (!signature || !process.env.CREEM_WEBHOOK_SECRET) {
-    return NextResponse.json({ error: "Missing signature" }, { status: 401 });
+function handleWebhook() {
+  if (isDemoMode()) {
+    return null;
   }
 
-  if (!verifyWebhookSignature(body, signature, process.env.CREEM_WEBHOOK_SECRET)) {
-    return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
-  }
-
-  let event: { id?: string; eventType: string; object: Record<string, unknown> };
-  try {
-    event = JSON.parse(body);
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-  }
-
-  const eventType = event.eventType;
   const db = getSupabaseAdmin();
 
-  // Idempotency check
-  if (event.id) {
-    const { data: existing } = await db
-      .from("webhook_events")
-      .select("id")
-      .eq("id", event.id)
-      .maybeSingle();
+  return Webhook({
+    webhookSecret: process.env.CREEM_WEBHOOK_SECRET!,
 
-    if (existing) {
-      return NextResponse.json({ received: true, duplicate: true });
-    }
-
-    await db.from("webhook_events").insert({ id: event.id, event_type: eventType as string });
-  }
-
-  if (eventType === "checkout.completed") {
-    const { customer, product, subscription } = event.object as {
-      customer: { id: string; metadata?: { user_id?: string } };
-      product: { id: string; name: string };
-      subscription?: { id: string; current_period_end?: string; current_period_end_date?: string };
-    };
-
-    if (!customer.metadata?.user_id) {
-      return NextResponse.json({ error: "Missing user_id in metadata" }, { status: 400 });
-    }
-
-    if (subscription) {
-      // Subscription purchase — upsert into subscriptions
-      const { error } = await db.from("subscriptions").upsert(
-        {
-          user_id: customer.metadata.user_id,
-          creem_customer_id: customer.id,
-          creem_subscription_id: subscription.id,
-          creem_product_id: product.id,
-          product_name: product.name,
-          status: "active",
-          current_period_end:
-            subscription.current_period_end_date || subscription.current_period_end,
-        },
-        { onConflict: "user_id" },
-      );
-
-      if (error) {
-        console.error("Webhook DB error (checkout.completed subscription):", error);
-        return NextResponse.json({ error: "Database error" }, { status: 500 });
-      }
-    } else {
-      // One-time purchase — insert into purchases
-      const { error } = await db.from("purchases").insert({
-        user_id: customer.metadata.user_id,
-        creem_customer_id: customer.id,
-        creem_product_id: product.id,
-        product_name: product.name,
+    onCheckoutCompleted: async (event) => {
+      const row = buildSubscriptionUpsert({
+        metadata: event.metadata as { user_id?: string } | undefined,
+        product: { id: event.product.id, name: event.product.name },
+        customer: event.customer ? { id: event.customer.id } : { id: "" },
+        subscription: event.subscription
+          ? {
+              id: event.subscription.id,
+              current_period_end_date: event.subscription.current_period_end_date,
+              canceled_at: null,
+            }
+          : undefined,
       });
 
-      if (error) {
-        console.error("Webhook DB error (checkout.completed one-time):", error);
-        return NextResponse.json({ error: "Database error" }, { status: 500 });
+      if (!row.user_id) {
+        console.log("[webhook] checkout.completed: no user_id in metadata, skipping");
+        return;
       }
-    }
-  } else if (SUBSCRIPTION_STATUS_MAP[eventType]) {
-    const sub = event.object as {
-      id: string;
-      current_period_end?: string;
-      current_period_end_date?: string;
-    };
-    const status = SUBSCRIPTION_STATUS_MAP[eventType];
-    const updateData: Record<string, string> = { status };
 
-    if (status === "active") {
-      const periodEnd = sub.current_period_end_date || sub.current_period_end;
-      if (periodEnd) updateData.current_period_end = periodEnd;
-    }
+      // Idempotency check
+      const { data: existing } = await db
+        .from("webhook_events")
+        .select("id")
+        .eq("id", event.webhookId)
+        .single();
 
-    const { error } = await db
-      .from("subscriptions")
-      .update(updateData)
-      .eq("creem_subscription_id", sub.id);
+      if (existing) {
+        console.log(`[webhook] duplicate event ${event.webhookId}, skipping`);
+        return;
+      }
 
-    if (error) {
-      console.error(`Webhook DB error (${eventType}):`, error);
-      return NextResponse.json({ error: "Database error" }, { status: 500 });
-    }
-  } else {
-    console.log(`Unhandled event: ${eventType}`);
+      await db.from("webhook_events").insert({
+        id: event.webhookId,
+        event_type: "checkout.completed",
+      });
+
+      await db.from("subscriptions").upsert(row, { onConflict: "user_id" });
+    },
+
+    onSubscriptionActive: async (event) => {
+      const update = buildSubscriptionUpdate("active", {
+        current_period_end_date: event.current_period_end_date,
+      });
+      await db.from("subscriptions").update(update).eq("creem_subscription_id", event.id);
+    },
+
+    onSubscriptionPaid: async (event) => {
+      const update = buildSubscriptionUpdate("active", {
+        current_period_end_date: event.current_period_end_date,
+      });
+      await db.from("subscriptions").update(update).eq("creem_subscription_id", event.id);
+    },
+
+    onSubscriptionCanceled: async (event) => {
+      const update = buildSubscriptionUpdate("cancelled", {
+        canceled_at: event.canceled_at,
+      });
+      await db.from("subscriptions").update(update).eq("creem_subscription_id", event.id);
+    },
+
+    onSubscriptionExpired: async (event) => {
+      await db
+        .from("subscriptions")
+        .update({ status: "expired" })
+        .eq("creem_subscription_id", event.id);
+    },
+
+    onSubscriptionPaused: async (event) => {
+      await db
+        .from("subscriptions")
+        .update({ status: "paused" })
+        .eq("creem_subscription_id", event.id);
+    },
+
+    onSubscriptionTrialing: async (event) => {
+      const update = buildSubscriptionUpdate("trialing", {
+        current_period_end_date: event.current_period_end_date,
+      });
+      await db.from("subscriptions").update(update).eq("creem_subscription_id", event.id);
+    },
+
+    onSubscriptionPastDue: async (event) => {
+      await db
+        .from("subscriptions")
+        .update({ status: "past_due" })
+        .eq("creem_subscription_id", event.id);
+    },
+
+    onSubscriptionUpdate: async (event) => {
+      const productId = typeof event.product === "string" ? event.product : event.product.id;
+      await db
+        .from("subscriptions")
+        .update({
+          creem_product_id: productId,
+          status: event.status,
+          current_period_end: event.current_period_end_date
+            ? new Date(event.current_period_end_date).toISOString()
+            : undefined,
+        })
+        .eq("creem_subscription_id", event.id);
+    },
+
+    onRefundCreated: async (event) => {
+      const subscriptionId =
+        typeof event.subscription === "string" ? event.subscription : event.subscription?.id;
+
+      const { data: sub } = await db
+        .from("subscriptions")
+        .select("user_id")
+        .eq("creem_subscription_id", subscriptionId ?? "")
+        .single();
+
+      await db.from("billing_events").insert({
+        user_id: sub?.user_id,
+        event_type: "refund",
+        creem_transaction_id: event.transaction.id,
+        amount: event.refund_amount,
+        currency: event.refund_currency,
+        status: "completed",
+      });
+    },
+
+    onDisputeCreated: async (event) => {
+      const subscriptionId =
+        typeof event.subscription === "string" ? event.subscription : event.subscription?.id;
+
+      const { data: sub } = await db
+        .from("subscriptions")
+        .select("user_id")
+        .eq("creem_subscription_id", subscriptionId ?? "")
+        .single();
+
+      await db.from("billing_events").insert({
+        user_id: sub?.user_id,
+        event_type: "dispute",
+        creem_transaction_id: event.transaction.id,
+        amount: event.amount,
+        currency: event.currency,
+        status: "open",
+      });
+    },
+
+    onGrantAccess: async ({ reason, customer, metadata }) => {
+      const userId = (metadata as Record<string, string> | undefined)?.referenceId;
+      console.log(
+        `[webhook] Grant access (${reason}) for user ${userId ?? "unknown"}, customer ${customer.email}`,
+      );
+    },
+
+    onRevokeAccess: async ({ reason, customer, metadata }) => {
+      const userId = (metadata as Record<string, string> | undefined)?.referenceId;
+      console.log(
+        `[webhook] Revoke access (${reason}) for user ${userId ?? "unknown"}, customer ${customer.email}`,
+      );
+    },
+  });
+}
+
+const webhookHandler = handleWebhook();
+
+export async function POST(request: Request) {
+  if (!webhookHandler) {
+    // Demo mode — no-op
+    return new Response(JSON.stringify({ ok: true }), { status: 200 });
   }
-
-  return NextResponse.json({ received: true });
+  return webhookHandler(request as never);
 }

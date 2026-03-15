@@ -9,11 +9,7 @@ interface Subscription {
   creem_customer_id: string;
 }
 
-export function SubscriptionCard({
-  subscription,
-}: {
-  subscription: Subscription | null;
-}) {
+export function SubscriptionCard({ subscription }: { subscription: Subscription | null }) {
   const [loading, setLoading] = useState(false);
 
   async function handleManageBilling() {
@@ -30,14 +26,9 @@ export function SubscriptionCard({
         className="bg-bg-secondary rounded-2xl border-2 border-border p-6"
         style={{ boxShadow: "4px 4px 0px rgba(255, 255, 255, 0.06)" }}
       >
-        <h2 className="text-lg font-extrabold text-text-primary mb-2">
-          Subscription
-        </h2>
+        <h2 className="text-lg font-extrabold text-text-primary mb-2">Subscription</h2>
         <p className="text-text-muted mb-4">No active subscription.</p>
-        <a
-          href="/pricing"
-          className="inline-block px-5 py-2.5 btn-primary text-sm"
-        >
+        <a href="/pricing" className="inline-block px-5 py-2.5 btn-primary text-sm">
           View Plans →
         </a>
       </div>
@@ -56,15 +47,11 @@ export function SubscriptionCard({
       className="bg-bg-secondary rounded-2xl border-2 border-border p-6"
       style={{ boxShadow: "4px 4px 0px rgba(255, 255, 255, 0.06)" }}
     >
-      <h2 className="text-lg font-extrabold text-text-primary mb-4">
-        Subscription
-      </h2>
+      <h2 className="text-lg font-extrabold text-text-primary mb-4">Subscription</h2>
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-text-secondary">Plan</span>
-          <span className="font-bold text-text-primary">
-            {subscription.product_name}
-          </span>
+          <span className="font-bold text-text-primary">{subscription.product_name}</span>
         </div>
         <div className="flex items-center justify-between">
           <span className="text-text-secondary">Status</span>

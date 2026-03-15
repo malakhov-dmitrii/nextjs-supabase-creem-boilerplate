@@ -27,9 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${bricolage.variable} ${jetbrainsMono.variable} antialiased`}
-      >
+      <body className={`${bricolage.variable} ${jetbrainsMono.variable} antialiased`}>
         {children}
       </body>
     </html>

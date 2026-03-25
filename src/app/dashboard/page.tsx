@@ -8,6 +8,7 @@ import { CreditsCard } from "@/components/credits-card";
 import { LicenseCard } from "@/components/license-card";
 import { SeatManager } from "@/components/seat-manager";
 import { SignOutButton } from "@/components/sign-out-button";
+import { getPlanFeatures } from "@/lib/entitlements";
 import { SubscriptionCard } from "@/components/subscription-card";
 import { UpgradeDialog } from "@/components/upgrade-dialog";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
@@ -179,10 +180,9 @@ export default async function DashboardPage() {
           <h2 className="text-lg font-extrabold text-text-primary mb-4">Your SaaS Features</h2>
           {isActive ? (
             <div className="space-y-3">
-              <Feature label="Unlimited projects" />
-              <Feature label="Priority support" />
-              <Feature label="Advanced analytics" />
-              <Feature label="Custom integrations" />
+              {getPlanFeatures(subscription?.product_name ?? "starter").map((feature) => (
+                <Feature key={feature} label={feature.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())} />
+              ))}
             </div>
           ) : (
             <p className="text-text-muted">

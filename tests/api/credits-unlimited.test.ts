@@ -1,9 +1,5 @@
-import { describe, test, expect } from "vitest";
-import {
-  isUnlimited,
-  CREDIT_UNLIMITED,
-  getCreditAllocation,
-} from "@/app/api/credits/helpers";
+import { describe, expect, test } from "vitest";
+import { CREDIT_UNLIMITED, getCreditAllocation, isUnlimited } from "@/app/api/credits/helpers";
 
 describe("getCreditAllocation", () => {
   test("returns -1 (unlimited) for enterprise", () => {

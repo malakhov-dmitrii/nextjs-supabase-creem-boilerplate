@@ -16,8 +16,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ??
-      "https://nextjs-supabase-creem-boilerplate.vercel.app"
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://nextjs-supabase-creem-boilerplate.vercel.app",
   ),
   title: "SaaSKit — Next.js + Supabase + Creem Boilerplate",
   description:
@@ -40,8 +39,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "SaaSKit — Ship your SaaS in hours",
-    description:
-      "Production-ready boilerplate with Creem payments, Supabase auth, and demo mode.",
+    description: "Production-ready boilerplate with Creem payments, Supabase auth, and demo mode.",
   },
 };
 

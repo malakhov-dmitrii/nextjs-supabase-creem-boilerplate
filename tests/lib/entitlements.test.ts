@@ -1,10 +1,5 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
-import {
-  getPlanFeatures,
-  planHasFeature,
-  hasAccess,
-  PLAN_FEATURES,
-} from "@/lib/entitlements";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+import { getPlanFeatures, hasAccess, PLAN_FEATURES, planHasFeature } from "@/lib/entitlements";
 
 // Mock Supabase admin for hasAccess tests
 const mockMaybeSingle = vi.fn();

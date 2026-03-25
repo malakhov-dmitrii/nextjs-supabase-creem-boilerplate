@@ -1,9 +1,5 @@
-import { describe, it, expect } from "vitest";
-import {
-  validateSpendRequest,
-  isUnlimited,
-  CREDIT_UNLIMITED,
-} from "@/app/api/credits/helpers";
+import { describe, expect, it } from "vitest";
+import { CREDIT_UNLIMITED, isUnlimited, validateSpendRequest } from "@/app/api/credits/helpers";
 
 describe("isUnlimited", () => {
   it("returns true for CREDIT_UNLIMITED sentinel", () => {

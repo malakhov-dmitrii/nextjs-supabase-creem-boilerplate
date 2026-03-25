@@ -16,9 +16,7 @@ const rateLimiter = redis
     })
   : null;
 
-export async function checkRateLimit(
-  identifier: string,
-): Promise<{ success: boolean }> {
+export async function checkRateLimit(identifier: string): Promise<{ success: boolean }> {
   if (!rateLimiter) return { success: true };
   return rateLimiter.limit(identifier);
 }

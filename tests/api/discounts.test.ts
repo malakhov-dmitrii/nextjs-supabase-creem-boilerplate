@@ -1,8 +1,5 @@
-import { describe, it, expect } from "vitest";
-import {
-  validateDiscountCreate,
-  buildCheckoutWithDiscount,
-} from "@/app/api/discounts/helpers";
+import { describe, expect, it } from "vitest";
+import { buildCheckoutWithDiscount, validateDiscountCreate } from "@/app/api/discounts/helpers";
 
 describe("validateDiscountCreate", () => {
   it("accepts valid percentage discount", () => {

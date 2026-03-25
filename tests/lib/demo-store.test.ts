@@ -1,10 +1,6 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { isDemoMode } from "@/lib/demo/mode";
-import {
-  getDemoStore,
-  resetDemoStore,
-  type DemoStore,
-} from "@/lib/demo/store";
+import { type DemoStore, getDemoStore, resetDemoStore } from "@/lib/demo/store";
 
 afterEach(() => {
   vi.unstubAllEnvs();

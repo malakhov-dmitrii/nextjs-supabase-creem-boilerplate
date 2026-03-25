@@ -1,8 +1,8 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   validateCancelRequest,
-  validateUpgradeRequest,
   validateSeatUpdate,
+  validateUpgradeRequest,
 } from "@/app/api/subscriptions/validators";
 
 describe("validateCancelRequest", () => {

@@ -11,8 +11,12 @@
       "style": {
         "noNonNullAssertion": "off"
       },
+      "suspicious": {
+        "noThenProperty": "off"
+      },
       "a11y": {
-        "noSvgWithoutTitle": "off"
+        "noSvgWithoutTitle": "off",
+        "useSemanticElements": "off"
       },
       "complexity": {
         "noImportantStyles": "off"

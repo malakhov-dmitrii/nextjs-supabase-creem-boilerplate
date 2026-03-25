@@ -1,8 +1,8 @@
 import { Webhook } from "@creem_io/nextjs";
 import { isDemoMode } from "@/lib/demo/mode";
+import { sendPaymentConfirmation } from "@/lib/email";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { buildSubscriptionUpdate, buildSubscriptionUpsert, extractUserId } from "./handlers";
-import { sendPaymentConfirmation } from "@/lib/email";
 
 function handleWebhook() {
   if (isDemoMode()) {

@@ -1,8 +1,6 @@
 import { Resend } from "resend";
 
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 interface EmailResult {
   success: boolean;
@@ -10,10 +8,7 @@ interface EmailResult {
   id?: string;
 }
 
-export async function sendWelcomeEmail(
-  to: string,
-  name: string,
-): Promise<EmailResult> {
+export async function sendWelcomeEmail(to: string, name: string): Promise<EmailResult> {
   if (!resend) return { success: true, skipped: true };
 
   try {

@@ -28,10 +28,7 @@ export function CheckoutSync() {
 
   if (status === "waiting") {
     return (
-      <div
-        className="bg-success/10 border-2 border-success/30 rounded-2xl p-4 mb-6"
-        role="status"
-      >
+      <div className="bg-success/10 border-2 border-success/30 rounded-2xl p-4 mb-6" role="status">
         <p className="text-success font-bold">
           Payment successful! Activating your subscription...
         </p>

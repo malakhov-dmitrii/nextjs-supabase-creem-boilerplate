@@ -1,6 +1,6 @@
-import { NextResponse, type NextRequest } from "next/server";
-import { updateSession } from "@/lib/supabase/middleware";
+import { type NextRequest, NextResponse } from "next/server";
 import { isDemoMode } from "@/lib/demo/mode";
+import { updateSession } from "@/lib/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
   if (isDemoMode()) {

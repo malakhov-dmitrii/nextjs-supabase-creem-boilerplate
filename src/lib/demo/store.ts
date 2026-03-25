@@ -64,9 +64,7 @@ export interface DemoStore {
 
 function createSeededStore(): DemoStore {
   const now = new Date().toISOString();
-  const thirtyDaysFromNow = new Date(
-    Date.now() + 30 * 24 * 60 * 60 * 1000,
-  ).toISOString();
+  const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
   return {
     users: new Map([
@@ -97,9 +95,7 @@ function createSeededStore(): DemoStore {
         },
       ],
     ]),
-    creditWallets: new Map([
-      ["demo-user", { user_id: "demo-user", balance: 50 }],
-    ]),
+    creditWallets: new Map([["demo-user", { user_id: "demo-user", balance: 50 }]]),
     creditTransactions: new Map([
       [
         "ct_1",

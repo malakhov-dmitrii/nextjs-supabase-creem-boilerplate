@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { act } from "react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { PricingCard } from "@/components/pricing-card";
 
 const mockPlan = {
@@ -65,7 +65,9 @@ describe("PricingCard", () => {
 
   it("shows Redirecting... loading state", async () => {
     let resolvePromise!: (value: unknown) => void;
-    const pendingPromise = new Promise((resolve) => { resolvePromise = resolve; });
+    const pendingPromise = new Promise((resolve) => {
+      resolvePromise = resolve;
+    });
     vi.stubGlobal("fetch", vi.fn().mockReturnValue(pendingPromise));
 
     render(<PricingCard plan={mockPlan} />);

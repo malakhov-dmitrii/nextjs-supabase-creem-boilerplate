@@ -8,9 +8,9 @@ import { CreditsCard } from "@/components/credits-card";
 import { LicenseCard } from "@/components/license-card";
 import { SeatManager } from "@/components/seat-manager";
 import { SignOutButton } from "@/components/sign-out-button";
-import { getPlanFeatures } from "@/lib/entitlements";
 import { SubscriptionCard } from "@/components/subscription-card";
 import { UpgradeDialog } from "@/components/upgrade-dialog";
+import { getPlanFeatures } from "@/lib/entitlements";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { createSupabaseServer } from "@/lib/supabase/server";
 
@@ -181,7 +181,10 @@ export default async function DashboardPage() {
           {isActive ? (
             <div className="space-y-3">
               {getPlanFeatures(subscription?.product_name ?? "starter").map((feature) => (
-                <Feature key={feature} label={feature.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())} />
+                <Feature
+                  key={feature}
+                  label={feature.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+                />
               ))}
             </div>
           ) : (

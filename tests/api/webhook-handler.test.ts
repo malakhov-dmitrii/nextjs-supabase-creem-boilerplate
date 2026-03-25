@@ -1,8 +1,8 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
-  mapSubscriptionStatus,
-  buildSubscriptionUpsert,
   buildSubscriptionUpdate,
+  buildSubscriptionUpsert,
+  mapSubscriptionStatus,
 } from "@/app/api/webhooks/creem/handlers";
 
 describe("mapSubscriptionStatus", () => {

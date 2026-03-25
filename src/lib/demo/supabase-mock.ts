@@ -35,8 +35,8 @@ export function createDemoClient(): any {
 
   function buildQuery(tableName: string) {
     const table = getTable(tableName);
-    let rows = Array.from(table.values());
-    let selectedColumns: string | null = null;
+    const rows = Array.from(table.values());
+    let _selectedColumns: string | null = null;
     const filters: Array<(row: Row) => boolean> = [];
     let orderBy: { col: string; asc: boolean } | null = null;
     let limitN: number | null = null;
@@ -45,7 +45,7 @@ export function createDemoClient(): any {
 
     const chain = {
       select(cols?: string, opts?: { count?: string; head?: boolean }) {
-        selectedColumns = cols ?? "*";
+        _selectedColumns = cols ?? "*";
         if (opts?.count) countOnly = true;
         if (opts?.head) headOnly = true;
         return chain;
@@ -73,7 +73,8 @@ export function createDemoClient(): any {
       insert(data: Row | Row[]) {
         const items = Array.isArray(data) ? data : [data];
         for (const item of items) {
-          const id = (item.id as string) ?? `demo_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+          const id =
+            (item.id as string) ?? `demo_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
           table.set(id, { ...item, id });
         }
         return { data: items, error: null };
@@ -81,7 +82,8 @@ export function createDemoClient(): any {
       upsert(data: Row | Row[], _opts?: { onConflict?: string }) {
         const items = Array.isArray(data) ? data : [data];
         for (const item of items) {
-          const id = (item.id as string) ?? `demo_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+          const id =
+            (item.id as string) ?? `demo_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
           table.set(id, { ...item, id });
         }
         return { data: items, error: null };

@@ -1,6 +1,6 @@
-import { describe, test, expect } from "vitest";
-import sitemap from "@/app/sitemap";
+import { describe, expect, test } from "vitest";
 import robots from "@/app/robots";
+import sitemap from "@/app/sitemap";
 
 describe("sitemap", () => {
   test("includes home page", () => {
@@ -25,7 +25,7 @@ describe("robots", () => {
     const config = robots();
     const rules = Array.isArray(config.rules) ? config.rules : [config.rules];
     const disallowed = rules.flatMap((r) =>
-      Array.isArray(r.disallow) ? r.disallow : r.disallow ? [r.disallow] : []
+      Array.isArray(r.disallow) ? r.disallow : r.disallow ? [r.disallow] : [],
     );
     expect(disallowed).toContain("/api/");
     expect(disallowed).toContain("/dashboard/");

@@ -58,7 +58,7 @@ alter table public.subscriptions add column if not exists seats integer default 
 create table if not exists public.credits (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users(id) on delete cascade not null unique,
-  balance integer not null default 0 check (balance >= 0),
+  balance integer not null default 0 check (balance >= -1),
   updated_at timestamptz default now()
 );
 
@@ -105,6 +105,13 @@ begin
 
   if v_balance is null then
     raise exception 'No credits record for user';
+  end if;
+
+  -- Unlimited credits: log spend but don't deduct
+  if v_balance = -1 then
+    insert into public.credit_transactions (user_id, amount, type, description)
+    values (p_user_id, -p_amount, 'spend', p_reason);
+    return -1;
   end if;
 
   if v_balance < p_amount then

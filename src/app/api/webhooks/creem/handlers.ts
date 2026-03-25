@@ -68,6 +68,10 @@ export interface SubscriptionUpdateRow {
   cancel_at?: string;
 }
 
+export function extractUserId(metadata: Record<string, string> | undefined): string | undefined {
+  return metadata?.user_id;
+}
+
 export function buildSubscriptionUpdate(
   status: string,
   fields: SubscriptionUpdateFields,

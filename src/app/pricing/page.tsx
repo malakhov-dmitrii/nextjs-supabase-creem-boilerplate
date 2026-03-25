@@ -1,20 +1,19 @@
 import Link from "next/link";
 import { PricingSection } from "@/components/pricing-section";
 
-// Creem test product IDs — replace with production IDs before going live
 const plans = [
   {
     name: "Starter",
     price: "$9",
     period: "month",
-    productId: "prod_2U8uqiBvIw7tRkwwG2flRw",
+    productId: process.env.NEXT_PUBLIC_CREEM_STARTER_PRODUCT_ID ?? "prod_starter",
     features: ["3 projects", "Basic analytics", "Email support", "1 team member"],
   },
   {
     name: "Pro",
     price: "$29",
     period: "month",
-    productId: "prod_1CqUBve5mBwFXcE9i02GJw",
+    productId: process.env.NEXT_PUBLIC_CREEM_PRO_PRODUCT_ID ?? "prod_pro",
     popular: true,
     features: [
       "Unlimited projects",
@@ -29,7 +28,7 @@ const plans = [
     name: "Enterprise",
     price: "$99",
     period: "month",
-    productId: "prod_4GCQZSu3BSZMaXSkzE8hD4",
+    productId: process.env.NEXT_PUBLIC_CREEM_ENTERPRISE_PRODUCT_ID ?? "prod_enterprise",
     features: [
       "Everything in Pro",
       "Unlimited team members",

@@ -15,12 +15,7 @@ export default async function AdminPage() {
   // Simple admin check — configure ADMIN_EMAIL in env
   const adminEmail = process.env.ADMIN_EMAIL;
   if (!adminEmail || user.email !== adminEmail) {
-    return (
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <h1 className="text-2xl font-extrabold text-text-primary mb-4">Access Denied</h1>
-        <p className="text-text-muted">You don&apos;t have admin access.</p>
-      </div>
-    );
+    redirect("/dashboard");
   }
 
   const db = getSupabaseAdmin();

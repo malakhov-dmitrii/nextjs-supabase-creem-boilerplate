@@ -11,6 +11,16 @@ interface SpendData {
   reason: string;
 }
 
+const PLAN_CREDITS: Record<string, number> = {
+  starter: 100,
+  pro: 500,
+  enterprise: CREDIT_UNLIMITED,
+};
+
+export function getCreditAllocation(plan: string): number {
+  return PLAN_CREDITS[plan.toLowerCase()] ?? 100;
+}
+
 export function validateSpendRequest(body: Record<string, unknown>): ValidationResult<SpendData> {
   const { amount, reason } = body;
 

@@ -1,7 +1,8 @@
 import { Webhook } from "@creem_io/nextjs";
 import { isDemoMode } from "@/lib/demo/mode";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { buildSubscriptionUpdate, buildSubscriptionUpsert } from "./handlers";
+import { buildSubscriptionUpdate, buildSubscriptionUpsert, extractUserId } from "./handlers";
+import { sendPaymentConfirmation } from "@/lib/email";
 
 function handleWebhook() {
   if (isDemoMode()) {
@@ -50,6 +51,15 @@ function handleWebhook() {
       });
 
       await db.from("subscriptions").upsert(row, { onConflict: "user_id" });
+
+      // Send payment confirmation email
+      if (event.customer?.email) {
+        await sendPaymentConfirmation(
+          event.customer.email,
+          event.product?.name ?? "Subscription",
+          event.product?.price ?? 0,
+        );
+      }
     },
 
     onSubscriptionActive: async (event) => {
@@ -155,18 +165,25 @@ function handleWebhook() {
       });
     },
 
-    onGrantAccess: async ({ reason, customer, metadata }) => {
-      const userId = (metadata as Record<string, string> | undefined)?.referenceId;
-      console.log(
-        `[webhook] Grant access (${reason}) for user ${userId ?? "unknown"}, customer ${customer.email}`,
-      );
+    onGrantAccess: async ({ reason, metadata }) => {
+      const userId = extractUserId(metadata as Record<string, string> | undefined);
+      if (!userId) {
+        console.log("[webhook] Grant access: no user_id in metadata");
+        return;
+      }
+      await db.from("subscriptions").update({ status: "active" }).eq("user_id", userId);
+      console.log(`[webhook] Granted access (${reason}) for user ${userId}`);
     },
 
-    onRevokeAccess: async ({ reason, customer, metadata }) => {
-      const userId = (metadata as Record<string, string> | undefined)?.referenceId;
-      console.log(
-        `[webhook] Revoke access (${reason}) for user ${userId ?? "unknown"}, customer ${customer.email}`,
-      );
+    onRevokeAccess: async ({ reason, metadata }) => {
+      const userId = extractUserId(metadata as Record<string, string> | undefined);
+      if (!userId) {
+        console.log("[webhook] Revoke access: no user_id in metadata");
+        return;
+      }
+      const status = String(reason).includes("expired") ? "expired" : "cancelled";
+      await db.from("subscriptions").update({ status }).eq("user_id", userId);
+      console.log(`[webhook] Revoked access (${reason}) for user ${userId}`);
     },
   });
 }

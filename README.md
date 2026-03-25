@@ -1,5 +1,7 @@
 # SaaSKit — Next.js + Supabase + Creem
 
+[![CI](https://github.com/malakhov-dmitrii/nextjs-supabase-creem-boilerplate/actions/workflows/ci.yml/badge.svg)](https://github.com/malakhov-dmitrii/nextjs-supabase-creem-boilerplate/actions/workflows/ci.yml)
+
 > **Live Demo:** [nextjs-supabase-creem-boilerplate.vercel.app](https://nextjs-supabase-creem-boilerplate.vercel.app/) | **Tutorial:** [dev.to article](https://dev.to/hennessy811/build-a-complete-saas-with-nextjs-supabase-creem-subscriptions-credits-licenses-in-30-4jmb) | **Demo Mode:** Clone and run — works without any accounts
 
 The most comprehensive SaaS boilerplate with Creem payments. Launch your paid SaaS in hours, not weeks.

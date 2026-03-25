@@ -58,8 +58,8 @@ All flows have been recorded with Playwright and are available in the [`video-pr
 No accounts needed. Clone and run:
 
 ```bash
-git clone <repo-url> saaskit
-cd saaskit
+npx degit malakhov-dmitrii/nextjs-supabase-creem-boilerplate my-saas
+cd my-saas
 npm install
 npm run dev
 ```

@@ -1,8 +1,10 @@
 # SaaSKit — Next.js + Supabase + Creem
 
+> **Live Demo:** [nextjs-supabase-creem-boilerplate.vercel.app](https://nextjs-supabase-creem-boilerplate.vercel.app/) | **Demo Mode:** Clone and run — works without any accounts
+
 The most comprehensive SaaS boilerplate with Creem payments. Launch your paid SaaS in hours, not weeks.
 
-**Auth + Database + Payments + Subscriptions + License Keys + Credits + Discount Codes** — everything you need to ship fast.
+**Auth + Payments + Subscriptions + License Keys + Credits + Discount Codes + Email Notifications + Rate Limiting + SEO** — everything you need to ship fast.
 
 ## Screenshots
 
@@ -71,7 +73,9 @@ Open [http://localhost:3000](http://localhost:3000). Demo mode activates automat
 - **Creem** — Payments, subscriptions, webhooks, licenses, discounts, billing portal
 - **Tailwind CSS 4** — Neo-brutalist design system
 - **Biome** — Linting and formatting
-- **Vitest** — 81+ unit tests
+- **Resend** — Transactional email (welcome + payment confirmation)
+- **Upstash** — Rate limiting on sensitive API routes
+- **Vitest** — 130+ unit tests (all importing from source)
 - **Playwright** — E2E tests
 - **GitHub Actions** — CI/CD pipeline
 
@@ -125,10 +129,26 @@ Open [http://localhost:3000](http://localhost:3000). Demo mode activates automat
 - Billing event monitoring (refunds, disputes)
 - Discount code creation guide
 
+### Email Notifications
+- Welcome email on signup (via Resend)
+- Payment confirmation on checkout
+- Graceful no-op without `RESEND_API_KEY` (works in demo mode)
+
+### SEO
+- Auto-generated `sitemap.xml` and `robots.txt`
+- Open Graph image generation (neo-brutalist branded)
+- Full metadata (OpenGraph, Twitter cards, keywords)
+
+### Rate Limiting
+- Sliding window rate limiting on sensitive API routes (Upstash)
+- Protected routes: checkout, billing portal, credit spend, subscription mutations
+- Graceful degradation without Redis (disabled in dev/demo)
+
 ### Additional
-- Demo mode — full-featured, zero-config, in-memory
+- Demo mode — full-featured, zero-config, pre-seeded with Pro subscription, credits, and license
 - Transaction history page with pagination
 - Alert banners for disputes and refunds
+- Dynamic feature gating via entitlements system
 - CI/CD with GitHub Actions (typecheck → lint → test → build)
 - Auto-detect test/production Creem environment from API key prefix
 
@@ -270,11 +290,16 @@ Add all environment variables from `.env.local` to Vercel project settings.
 | `NEXT_PUBLIC_CREEM_PRO_PRODUCT_ID` | Pro plan product ID |
 | `NEXT_PUBLIC_CREEM_ENTERPRISE_PRODUCT_ID` | Enterprise plan product ID |
 | `ADMIN_EMAIL` | Email for admin panel access |
+| `RESEND_API_KEY` | Resend API key for email (optional — emails skipped without this) |
+| `RESEND_FROM_EMAIL` | From address for emails (default: `SaaSKit <noreply@resend.dev>`) |
+| `UPSTASH_REDIS_REST_URL` | Upstash Redis URL for rate limiting (optional — disabled without this) |
+| `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis token |
+| `NEXT_PUBLIC_SITE_URL` | Site URL for SEO sitemap/robots (default: Vercel URL) |
 
 ## Testing
 
 ```bash
-npm test              # Run 81+ unit tests
+npm test              # Run 130+ unit tests
 npm run test:watch    # Watch mode
 npm run test:coverage # With coverage report
 npm run e2e           # Playwright E2E tests

@@ -51,5 +51,8 @@ next-env.d.ts
 # omc state
 .omc/
 
+# beast-plan
+.beast-plan/
+
 # Video proof scripts
 video-proofs/*.mjs

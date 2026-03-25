@@ -15,9 +15,34 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ??
+      "https://nextjs-supabase-creem-boilerplate.vercel.app"
+  ),
   title: "SaaSKit — Next.js + Supabase + Creem Boilerplate",
   description:
-    "Production-ready SaaS starter with authentication, database, payments, and subscriptions. Built with Next.js, Supabase, and Creem.",
+    "The most comprehensive SaaS boilerplate with Creem payments. Auth, subscriptions, license keys, credits, webhooks, and demo mode — ship your SaaS in hours.",
+  keywords: [
+    "SaaS boilerplate",
+    "Next.js",
+    "Supabase",
+    "Creem",
+    "payments",
+    "subscriptions",
+    "TypeScript",
+  ],
+  openGraph: {
+    title: "SaaSKit — Next.js + Supabase + Creem Boilerplate",
+    description:
+      "Auth, payments, subscriptions, license keys, credits wallet — ship your SaaS in hours.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SaaSKit — Ship your SaaS in hours",
+    description:
+      "Production-ready boilerplate with Creem payments, Supabase auth, and demo mode.",
+  },
 };
 
 export default function RootLayout({

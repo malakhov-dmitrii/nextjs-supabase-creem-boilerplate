@@ -62,14 +62,94 @@ export interface DemoStore {
   billingEvents: Map<string, { event_type: string; user_id?: string; amount?: number }>;
 }
 
-function createEmptyStore(): DemoStore {
+function createSeededStore(): DemoStore {
+  const now = new Date().toISOString();
+  const thirtyDaysFromNow = new Date(
+    Date.now() + 30 * 24 * 60 * 60 * 1000,
+  ).toISOString();
+
   return {
-    users: new Map(),
+    users: new Map([
+      [
+        "demo-user",
+        {
+          id: "demo-user",
+          email: "demo@saaskit.dev",
+          password: "demo",
+          full_name: "Demo User",
+        },
+      ],
+    ]),
     sessions: new Map(),
-    subscriptions: new Map(),
-    creditWallets: new Map(),
-    creditTransactions: new Map(),
-    licenses: new Map(),
+    subscriptions: new Map([
+      [
+        "sub_demo_pro",
+        {
+          id: "sub_demo_pro",
+          user_id: "demo-user",
+          creem_subscription_id: "sub_demo_pro",
+          creem_product_id: "prod_pro",
+          product_name: "Pro Plan",
+          status: "active",
+          current_period_end: thirtyDaysFromNow,
+          seats: 1,
+          created_at: now,
+        },
+      ],
+    ]),
+    creditWallets: new Map([
+      ["demo-user", { user_id: "demo-user", balance: 50 }],
+    ]),
+    creditTransactions: new Map([
+      [
+        "ct_1",
+        {
+          id: "ct_1",
+          user_id: "demo-user",
+          amount: 100,
+          type: "subscription_topup",
+          description: "Pro plan credit grant",
+          created_at: now,
+        },
+      ],
+      [
+        "ct_2",
+        {
+          id: "ct_2",
+          user_id: "demo-user",
+          amount: -30,
+          type: "spend",
+          description: "API usage",
+          created_at: now,
+        },
+      ],
+      [
+        "ct_3",
+        {
+          id: "ct_3",
+          user_id: "demo-user",
+          amount: -20,
+          type: "spend",
+          description: "Report generation",
+          created_at: now,
+        },
+      ],
+    ]),
+    licenses: new Map([
+      [
+        "lic_demo",
+        {
+          id: "lic_demo",
+          user_id: "demo-user",
+          key: "DEMO-XXXX-YYYY-ZZZZ",
+          product_id: "prod_pro",
+          product_name: "Pro Plan",
+          status: "active",
+          instance_name: "Demo Machine",
+          activated_at: now,
+        },
+      ],
+    ]),
     webhookEvents: new Map(),
     billingEvents: new Map(),
   };
@@ -82,13 +162,13 @@ declare global {
 
 export function getDemoStore(): DemoStore {
   if (!globalThis.__demoStore) {
-    globalThis.__demoStore = createEmptyStore();
+    globalThis.__demoStore = createSeededStore();
   }
   return globalThis.__demoStore;
 }
 
 export function resetDemoStore(): void {
-  globalThis.__demoStore = createEmptyStore();
+  globalThis.__demoStore = createSeededStore();
 }
 
 let idCounter = 0;

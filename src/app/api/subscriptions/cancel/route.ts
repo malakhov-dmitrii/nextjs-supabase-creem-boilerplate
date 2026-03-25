@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { creem } from "@/lib/creem";
 import { isDemoMode } from "@/lib/demo/mode";
 import { getDemoStore } from "@/lib/demo/store";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { createSupabaseServer } from "@/lib/supabase/server";
 import { validateCancelRequest } from "../validators";
 
@@ -25,6 +26,11 @@ export async function POST(request: NextRequest) {
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { success } = await checkRateLimit(user.id);
+  if (!success) {
+    return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
   }
 
   const body = await request.json();

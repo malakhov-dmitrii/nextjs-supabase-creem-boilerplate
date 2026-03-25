@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { creem } from "@/lib/creem";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { createSupabaseServer } from "@/lib/supabase/server";
 
 export async function POST() {
@@ -10,6 +11,11 @@ export async function POST() {
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { success } = await checkRateLimit(user.id);
+  if (!success) {
+    return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
   }
 
   const { data: subscription } = await supabase
